@@ -1,7 +1,6 @@
 <?php
-session_start();
 $title = "Connexion - Gestion des absences";
-require_once 'config/db.php';
+require_once 'includes/auth.php';
 require_once 'includes/header.php';
 
 // Traitement du formulaire de connexion
@@ -14,17 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE numero_apogee = ?");
         $stmt->execute([$numero_apogee]);
-        $etudiant = $stmt->fetch();
+        $student = $stmt->fetch();
 
-        if ($etudiant && password_verify($password, $etudiant['password'])) {
-            $_SESSION['etudiant_id'] = $etudiant['id'];
-            $_SESSION['nom'] = $etudiant['nom'];
+        if ($student && password_verify($password, $student['password'])) {
+            $_SESSION['user_id'] = $student['id_etudiant'];
+            $_SESSION['user_type'] = 'student';
+            $_SESSION['apogee'] = $student['numero_apogee'];
+            $_SESSION['nom'] = $student['nom'];
+            $_SESSION['prenom'] = $student['prenom'];
+            $_SESSION['id_filiere'] = $student['id_filiere'];
+            $_SESSION['last_activity'] = time();
+
             header("Location: dashboard_etudiant.php");
             exit;
         } else {
             $erreur = "Identifiants étudiant incorrects.";
         }
-
     } elseif ($user_type === 'admin') {
         $email = $_POST['email'];
         $password = $_POST['password'];
@@ -36,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($admin && password_verify($password, $admin['password'])) {
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['email'] = $admin['email'];
+            $_SESSION['user_role'] = 'admin'; // Added this line for auth.php
+            $_SESSION['last_activity'] = time();
+            
             header("Location: dashboard_admin.php");
             exit;
         } else {
@@ -46,6 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+
+<?php if (isset($erreur)): ?>
+    <div class="error-message" style="background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin: 20px auto; border: 1px solid #ef9a9a; max-width: 768px; text-align: center;">
+        <?= htmlspecialchars($erreur) ?>
+    </div>
+<?php endif; ?>
 
 <div class="container" id="container">
 
@@ -69,9 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
-            <?php if (isset($erreur) && $user_type === 'student'): ?>
-                <p style="color:red;"><?= htmlspecialchars($erreur) ?></p>
-            <?php endif; ?>
         </form>
     </div>
 
@@ -95,9 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
-            <?php if (isset($erreur) && $user_type === 'admin'): ?>
-                <p style="color:red;"><?= htmlspecialchars($erreur) ?></p>
-            <?php endif; ?>
         </form>
     </div>
 

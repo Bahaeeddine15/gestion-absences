@@ -44,7 +44,7 @@ function isAdmin() {
 }
 
 function isStudent() {
-    return isConnected() && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'etudiant';
+    return isConnected() && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'student';
 }
 
 function checkAdmin() {
@@ -54,9 +54,9 @@ function checkAdmin() {
     }
 }
 
-/*function checkEtudiant() {
+function checkEtudiant() {
     if (!isStudent()) {
         header('Location: index.php');
         exit();
     }
-}*/
+}
