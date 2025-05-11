@@ -585,32 +585,42 @@ button.ghost:hover i.login {
   background-color: #f9f9f9;
 }
 
-.dashboard h2 {
+.dashboard h2, h1 {
   text-align: center;
   margin-bottom: 2rem;
   color: #1a237e;
 }
 
 /* Informations personnelles */
-.student-info {
-  margin-bottom: 2rem;
+.welcome-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: hsl(235, 66%, 85%);
+    padding: 20px 40px;
+    border-radius: 12px;
+    margin-bottom: 30px;
 }
 
-.info-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  line-height: 1.8;
+.welcome-text h1 {
+    font-size: 40px;
+    margin: 0;
 }
 
-.info-card p {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+.welcome-text p {
+    font-size: 1.4rem;
+    margin: 5px 0 0;
+    color: #555;
 }
 
-.info-card strong {
-  color: #1a237e;
+.welcome-image img {
+    max-width: 200px;
+    height: auto;
+    background-color: white;
+}
+.welcome-image img {
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Statistiques */

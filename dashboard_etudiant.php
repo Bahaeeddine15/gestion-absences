@@ -59,15 +59,13 @@ $absencesByModule = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 <div class="dashboard">
-    <h2>Tableau de bord étudiant</h2>
-
-    <div class="student-info">
-        <h3>Informations personnelles</h3>
-        <div class="info-card">
-            <p><strong>Nom:</strong> <?php echo htmlspecialchars($student['prenom'] . ' ' . $student['nom']); ?></p>
-            <p><strong>Email:</strong> <?php echo htmlspecialchars($student['email']); ?></p>
-            <p><strong>Numéro Apogée:</strong> <?php echo htmlspecialchars($student['numero_apogee']); ?></p>
-            <p><strong>Filière:</strong> <?php echo htmlspecialchars($student['filiere_nom'] ?? 'Non définie'); ?></p>
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <h1>Hi, <?php echo htmlspecialchars($student['prenom']); ?> 👋</h2>
+            <p>Time to check in on your attendance!</p>
+        </div>
+        <div class="welcome-image">
+            <img src="assets/welcome-img.png" alt="Welcome illustration">
         </div>
     </div>
 
