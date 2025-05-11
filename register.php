@@ -1,13 +1,78 @@
 <?php
 $title = "Inscription - Gestion des absences";
+
+require_once 'config/db.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_type = $_POST['user_type'] ?? '';
+
+    if ($user_type === 'student') {
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $email = $_POST['email'];
+        $numero_apogee = $_POST['numero_apogee'];
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
+        $id_filiere = $_POST['id_filiere'];
+
+        if ($password !== $confirm_password) {
+            echo "Les mots de passe ne correspondent pas.";
+            exit;
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO etudiants (nom, prenom, email, numero_apogee, password, id_filiere)
+                                   VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashed_password, $id_filiere]);
+
+            header("Location: index.php?inscription=success");
+            exit;
+        } catch (PDOException $e) {
+            echo "Erreur : " . $e->getMessage();
+        }
+    } elseif ($user_type === 'admin') {
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $email = $_POST['email'];
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
+        $admin_code = $_POST['admin_code'];
+
+        /*if ($admin_code !== "ADMIN123") {
+            echo "Code administrateur invalide.";
+            exit;
+        }*/
+
+        if ($password !== $confirm_password) {
+            echo "Les mots de passe ne correspondent pas.";
+            exit;
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO admins (username, password, email)
+                                   VALUES (?, ?, ?)");
+            $stmt->execute([$username, $hashed_password, $email]);
+
+            header("Location: index.php?inscription=success");
+            exit;
+        } catch (PDOException $e) {
+            echo "Erreur : " . $e->getMessage();
+        }
+    }
+}
+
 require_once 'includes/header.php';
 
-// Fetch filières from database for student registration
 try {
     $stmt = $pdo->query("SELECT id, nom FROM filieres ORDER BY nom");
     $filieres = $stmt->fetchAll();
 } catch (PDOException $e) {
-    $filieres = []; // Empty array if query fails
+    $filieres = [];
 }
 ?>
 
@@ -15,22 +80,23 @@ try {
 
 <div class="container" id="container">
     <div class="form-container register-container">
-        <form action="register_process.php" method="post">
+        <!-- Correction ici : action="" -->
+        <form action="" method="post">
             <input type="hidden" name="user_type" value="student">
             <h1>Inscription Étudiant</h1>
             <input type="text" name="nom" placeholder="Nom" required>
             <input type="text" name="prenom" placeholder="Prénom" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="text" name="numero_apogee" placeholder="Numéro Apogée" required>
-
+<!--
             <select name="id_filiere" required>
                 <option value="">-- Sélectionner une filière --</option>
-                <?php foreach ($filieres as $filiere): ?>
+                <?php /*foreach ($filieres as $filiere): ?>
                     <option value="<?= htmlspecialchars($filiere['id']) ?>">
                         <?= htmlspecialchars($filiere['nom']) ?>
                     </option>
-                <?php endforeach; ?>
-            </select>
+                <?php endforeach;*/ ?>
+            </select>  -->
 
             <input type="password" name="password" placeholder="Mot de passe" required>
             <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
@@ -41,7 +107,8 @@ try {
 
     <!-- Admin Registration Form -->
     <div class="form-container login-container">
-        <form action="register_admin_process.php" method="post">
+        <!-- Correction ici aussi : action="" -->
+        <form action="" method="post">
             <input type="hidden" name="user_type" value="admin">
             <h1>Inscription Admin</h1>
             <input type="text" name="nom" placeholder="Nom" required>
@@ -85,7 +152,6 @@ try {
         const loginButton = document.getElementById('login');
         const container = document.getElementById('container');
 
-        // Initially show student registration
         container.classList.remove('right-panel-active');
 
         registrationButton.addEventListener('click', () => {
@@ -97,5 +163,11 @@ try {
         });
     });
 </script>
+
+<?php
+if (isset($_GET['inscription']) && $_GET['inscription'] == 'success') {
+    echo "<script>alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');</script>";
+}
+?>
 
 <?php require_once 'includes/footer.php'; ?>

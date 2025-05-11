@@ -1,14 +1,57 @@
 <?php
+session_start();
 $title = "Connexion - Gestion des absences";
+require_once 'config/db.php';
 require_once 'includes/header.php';
+
+// Traitement du formulaire de connexion
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_type = $_POST['user_type'] ?? '';
+
+    if ($user_type === 'student') {
+        $numero_apogee = $_POST['numero_apogee'];
+        $password = $_POST['password'];
+
+        $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE numero_apogee = ?");
+        $stmt->execute([$numero_apogee]);
+        $etudiant = $stmt->fetch();
+
+        if ($etudiant && password_verify($password, $etudiant['password'])) {
+            $_SESSION['etudiant_id'] = $etudiant['id'];
+            $_SESSION['nom'] = $etudiant['nom'];
+            header("Location: dashboard_etudiant.php");
+            exit;
+        } else {
+            $erreur = "Identifiants étudiant incorrects.";
+        }
+
+    } elseif ($user_type === 'admin') {
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ?");
+        $stmt->execute([$email]);
+        $admin = $stmt->fetch();
+
+        if ($admin && password_verify($password, $admin['password'])) {
+            $_SESSION['admin_id'] = $admin['id'];
+            $_SESSION['email'] = $admin['email'];
+            header("Location: dashboard_admin.php");
+            exit;
+        } else {
+            $erreur = "Identifiants administrateur incorrects.";
+        }
+    }
+}
 ?>
 
 <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
 
 <div class="container" id="container">
-    <!-- Student Login Form -->
+
+    <!-- Formulaire Connexion Étudiant -->
     <div class="form-container register-container">
-        <form action="login_process.php" method="post">
+        <form action="" method="post">
             <input type="hidden" name="user_type" value="student">
             <h1>Connexion Étudiant</h1>
             <input type="text" name="numero_apogee" placeholder="Numéro Apogée" required>
@@ -26,12 +69,15 @@ require_once 'includes/header.php';
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
+            <?php if (isset($erreur) && $user_type === 'student'): ?>
+                <p style="color:red;"><?= htmlspecialchars($erreur) ?></p>
+            <?php endif; ?>
         </form>
     </div>
 
-    <!-- Admin Login Form -->
+    <!-- Formulaire Connexion Admin -->
     <div class="form-container login-container">
-        <form action="login_process.php" method="post">
+        <form action="" method="post">
             <input type="hidden" name="user_type" value="admin">
             <h1>Connexion Admin</h1>
             <input type="email" name="email" placeholder="Email" required>
@@ -49,10 +95,13 @@ require_once 'includes/header.php';
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
+            <?php if (isset($erreur) && $user_type === 'admin'): ?>
+                <p style="color:red;"><?= htmlspecialchars($erreur) ?></p>
+            <?php endif; ?>
         </form>
     </div>
 
-    <!-- Overlay Effect -->
+    <!-- Effet de transition -->
     <div class="overlay-container">
         <div class="overlay">
             <div class="overlay-panel overlay-left">
@@ -81,7 +130,7 @@ require_once 'includes/header.php';
         const loginButton = document.getElementById('login');
         const container = document.getElementById('container');
 
-        // Initially show student login
+        // Affiche formulaire étudiant par défaut
         container.classList.remove('right-panel-active');
 
         registrationButton.addEventListener('click', () => {
