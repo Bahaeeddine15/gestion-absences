@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="" method="post">
             <input type="hidden" name="user_type" value="student">
             <h1>Connexion Étudiant</h1>
-            <input type="text" name="numero_apogee" placeholder="Numéro Apogée" required>
+            <input type="number" name="numero_apogee" placeholder="Numéro Apogée" required>
             <input type="password" name="password" placeholder="Mot de passe" required>
             <div class="content">
                 <div class="checkbox">
