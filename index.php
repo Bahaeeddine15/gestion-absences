@@ -38,9 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
 
         if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['email'] = $admin['email'];
-            $_SESSION['user_role'] = 'admin'; // Added this line for auth.php
+            $_SESSION['user_id'] = $admin['id_admin'];       // Change from admin_id to user_id
+            $_SESSION['user_role'] = 'admin';          // This is already correct
+            $_SESSION['email'] = $admin['email'];      // Keep this
+            $_SESSION['nom'] = $admin['nom'];          // Add these for consistency
+            $_SESSION['prenom'] = $admin['prenom'];    // Add these for consistency
             $_SESSION['last_activity'] = time();
             
             header("Location: dashboard_admin.php");

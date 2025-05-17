@@ -189,7 +189,7 @@ footer {
   overflow: hidden;
   width: 768px;
   max-width: 100%;
-  min-height: 500px; /* Reduced from 580px */
+  min-height: 520px; /* Reduced from 580px */
   margin: 2rem auto;
 }
 
@@ -429,12 +429,19 @@ button.ghost i {
   transition: 0.3s ease-in-out;
 }
 
+button.ghost i.register,
+button.ghost i.login {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 button.ghost i.register {
   right: 70px;
 }
 
 button.ghost i.login {
-  left: 70px;
+  left: 30px;
 }
 
 button.ghost:hover i.register {
@@ -470,6 +477,7 @@ button.ghost:hover i.login {
 
 .content label {
   font-size: 14px;
+  -webkit-user-select : none;
   user-select: none;
   padding-left: 5px;
 }

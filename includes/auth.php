@@ -1,5 +1,4 @@
 <?php
-// On configure les cookies AVANT de démarrer une session
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
@@ -12,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start(); // on démarre la session juste après avoir défini les cookies
 }
 
-require_once './config/db.php';
+require_once __DIR__. '/../config/db.php';
 
 function isStarted() {
     return session_status() === PHP_SESSION_ACTIVE;

@@ -107,9 +107,11 @@ if (isset($_POST['register'])) {
             </select>
 
             <input type="password" name="password" placeholder="Mot de passe" required>
-            <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
 
             <button type="submit" name="register" class="btn">S'inscrire</button>
+            <div class="form-footer">
+                <p>Vous avez déjà un compte?<a href="index.php">Se connecter</a></p>
+            </div>
         </form>
     </div>
 
@@ -123,10 +125,12 @@ if (isset($_POST['register'])) {
             <input type="email" name="email" placeholder="Email" required>
             <input type="text" name="username" placeholder="Nom d'utilisateur" required>
             <input type="password" name="password" placeholder="Mot de passe" required>
-            <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
-            <input type="text" name="admin_code" placeholder="Code d'administrateur" required>
+
 
             <button type="submit" name = "register" class="btn">S'inscrire</button>
+            <div class="form-footer">
+                <p>Vous avez déjà un compte? <a href="index.php">Se connecter</a></p>
+            </div>
         </form>
     </div>
 

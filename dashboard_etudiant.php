@@ -2,11 +2,8 @@
 require_once 'includes/auth.php';
 isStudent(); // Redirect if not a student
 
-$pageTitle = "Tableau de bord étudiant";
+$title = "Tableau de bord étudiant";
 include 'includes/header.php';
-
-// Connect to database
-require_once 'config/db.php';
 
 // Get student information
 $id_etudiant = $_SESSION['user_id'];
