@@ -108,7 +108,7 @@ if (isset($_POST['register'])) {
 
             <input type="password" name="password" placeholder="Mot de passe" required>
 
-            <button type="submit" name="register" class="btn">S'inscrire</button>
+            <button type="submit" name="register" class="register-btn">S'inscrire</button>
             <div class="form-footer">
                 <p>Vous avez déjà un compte?<a href="index.php">Se connecter</a></p>
             </div>
@@ -127,7 +127,7 @@ if (isset($_POST['register'])) {
             <input type="password" name="password" placeholder="Mot de passe" required>
 
 
-            <button type="submit" name = "register" class="btn">S'inscrire</button>
+            <button type="submit" name = "register" class="register-btn">S'inscrire</button>
             <div class="form-footer">
                 <p>Vous avez déjà un compte? <a href="index.php">Se connecter</a></p>
             </div>
@@ -140,7 +140,7 @@ if (isset($_POST['register'])) {
             <div class="overlay-panel overlay-left">
                 <h1 class="title">Admin</h1>
                 <p>Inscrivez-vous en tant qu'administrateur pour gérer le système</p>
-                <button class="ghost btn" id="login">
+                <button class="ghost-btn" id="login">
                     Inscription Admin
                     <i class="lni lni-arrow-left login"></i>
                 </button>
@@ -148,7 +148,7 @@ if (isset($_POST['register'])) {
             <div class="overlay-panel overlay-right">
                 <h1 class="title">Étudiant</h1>
                 <p>Inscrivez-vous en tant qu'étudiant pour accéder à votre compte</p>
-                <button class="ghost btn" id="register">
+                <button class="ghost-btn" id="register">
                     Inscription Étudiant
                     <i class="lni lni-arrow-right register"></i>
                 </button>

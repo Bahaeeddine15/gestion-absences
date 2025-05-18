@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="reset_password.php">Mot de passe oublié?</a>
                 </div>
             </div>
-            <button type="submit" class="btn">Se connecter</button>
+            <button type="submit" class="login-btn">Se connecter</button>
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="reset_password.php">Mot de passe oublié?</a>
                 </div>
             </div>
-            <button type="submit" class="btn">Se connecter</button>
+            <button type="submit" class="login-btn">Se connecter</button>
             <div class="form-footer">
                 <p>Pas encore inscrit? <a href="register.php">S'inscrire</a></p>
             </div>
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="overlay-panel overlay-left">
                 <h1 class="title">Admin</h1>
                 <p>Connectez-vous en tant qu'administrateur pour gérer le système</p>
-                <button class="ghost btn" id="login">
+                <button class="ghost-btn" id="login">
                     Connexion Admin
                     <i class="lni lni-arrow-left login"></i>
                 </button>
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="overlay-panel overlay-right">
                 <h1 class="title">Étudiant</h1>
                 <p>Connectez-vous en tant qu'étudiant pour accéder à vos informations</p>
-                <button class="ghost btn" id="register">
+                <button class="ghost-btn" id="register">
                     Connexion Étudiant
                     <i class="lni lni-arrow-right register"></i>
                 </button>
