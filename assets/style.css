@@ -973,3 +973,43 @@ table tr:hover {
     width: 100%;
   }
 }
+
+/* Special styling for the table in gestion_etudiants.php */
+body.page-gestion-etudiants .list-section {
+  overflow-x: auto;
+  padding: 15px;
+}
+
+body.page-gestion-etudiants .list-section table {
+  min-width: 800px; /* Ensure table has minimum width */
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Keep form fields properly contained */
+body.page-gestion-etudiants .form-section .form-group input,
+body.page-gestion-etudiants .form-section .form-group select,
+body.page-gestion-etudiants .form-section .form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Make sure the form section doesn't overflow */
+body.page-gestion-etudiants .form-section {
+  overflow-x: hidden;
+}
+
+/* For tablets and smaller screens optimize table's cell padding */
+@media (max-width: 1200px) {
+  body.page-gestion-etudiants .list-section table th,
+  body.page-gestion-etudiants .list-section table td {
+    padding: 8px 6px;
+  }
+}
+
+/* For mobile screens make the form area full-width */
+@media (max-width: 768px) {
+  body.page-gestion-etudiants .admin-content {
+    grid-template-columns: 1fr;
+  }
+}
