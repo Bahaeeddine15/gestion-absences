@@ -48,14 +48,14 @@ function isStudent() {
 
 function checkAdmin() {
     if (!isAdmin()) {
-        header('Location: index.php');
+        header('Location: /gestion-absences/index.php');
         exit();
     }
 }
 
 function checkEtudiant() {
     if (!isStudent()) {
-        header('Location: index.php');
+        header('Location: /gestion-absences/index.php');
         exit();
     }
 }

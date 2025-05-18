@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/auth.php';
-isAdmin();
+CheckAdmin();
 
 $title = "Tableau de bord administrateur";
 include 'includes/header.php';
@@ -112,7 +112,7 @@ $admin = $stmt->fetch();
             <tbody>
                 <?php foreach($recentAbsences as $absence) : ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($absence['etudiant_prénom']), ' ', $absence['etudiant_nom'];?></td>                 
+                        <td><?php echo htmlspecialchars($absence['etudiant_prenom']). ' '. htmlspecialchars($absence['etudiant_nom']);?></td>                 
                         <td><?php echo htmlspecialchars($absence['module_nom']); ?></td>
                         <td><?php echo htmlspecialchars($absence['date']); ?></td>
                         <td><?php echo $absence['justifiee'] ? 'Oui' : 'Non'; ?></td>                
