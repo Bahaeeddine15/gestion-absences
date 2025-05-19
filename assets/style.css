@@ -1223,3 +1223,156 @@ td .btn-edit,
 td .btn-delete {
   white-space: nowrap;
 }
+
+/* Filtres de recherche et barre de recherche - Liste des absences */
+.absence-filters {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(26,35,126,0.07);
+  padding: 18px 24px 10px 24px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.absence-filters input[type="text"] {
+  padding: 8px 14px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  background: #f7f9fa;
+  transition: border-color 0.2s;
+  min-width: 180px;
+}
+
+.absence-filters input[type="text"]:focus {
+  border-color: #1a237e;
+  outline: none;
+}
+
+.absence-filters select {
+  padding: 8px 12px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  background: #f7f9fa;
+  transition: border-color 0.2s;
+  min-width: 150px;
+}
+
+.absence-filters select:focus {
+  border-color: #1a237e;
+  outline: none;
+}
+
+.absence-filters button,
+.absence-filters input[type="submit"] {
+  background-color: #1a237e;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 38px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  margin-left: 10px;
+  box-shadow: 0 3px 5px rgba(26, 35, 126, 0.12);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.absence-filters button:hover,
+.absence-filters input[type="submit"]:hover {
+  background-color: #283593;
+  transform: translateY(-2px);
+}
+
+.absence-filters .btn-secondary {
+  background: #757575;
+  color: #fff;
+  border-radius: 30px;
+  padding: 10px 38px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 10px;
+  transition: background 0.2s;
+}
+
+.absence-filters .btn-secondary:hover {
+  background: #616161;
+}
+
+/* Garder les boutons Filtrer et Réinitialiser sur la même ligne */
+.absence-filters .filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .absence-filters .filter-actions {
+    flex-direction: row;
+    width: 100%;
+    margin-top: 8px;
+    justify-content: flex-start;
+  }
+  .absence-filters .filter-actions button,
+  .absence-filters .filter-actions .btn-secondary {
+    width: auto;
+    margin-left: 0;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .absence-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px 10px 8px 10px;
+  }
+  .absence-filters button,
+  .absence-filters input[type="submit"],
+  .absence-filters .btn-secondary {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
+
+.btn-edit, .btn-delete {
+  text-decoration: none !important;
+  outline: none;
+}
+
+.btn-edit:visited, .btn-delete:visited {
+  color: white;
+}
+
+.btn-edit:hover, .btn-delete:hover {
+  opacity: 0.92;
+  filter: brightness(0.97);
+}
+
+/* Actions dans les tableaux : boutons côte à côte et compacts */
+.table-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.table-actions .btn-edit,
+.table-actions .btn-delete {
+  padding: 6px 14px;
+  font-size: 13px;
+  min-width: unset;
+  margin: 0;
+  border-radius: 18px;
+  box-shadow: none;
+  white-space: nowrap;
+}

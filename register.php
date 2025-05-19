@@ -21,14 +21,11 @@ if (isset($_POST['register'])) {
     $prenom = trim($_POST['prenom']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
     $user_type = $_POST['user_type'];
     
     // Validation basique
     if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
         $error = "Tous les champs obligatoires doivent être remplis";
-    } elseif ($password !== $confirm_password) {
-        $error = "Les mots de passe ne correspondent pas";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Format d'email invalide";
     } else {
