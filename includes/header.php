@@ -11,7 +11,7 @@ $base_path = $in_admin ? '../' : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($title) ? $title : "Gestion des absences" ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="<?php echo $in_admin ? '../' : ''; ?>assets/style.css">
+    <link rel="stylesheet" href="/gestion-absences/assets/style.css">
 </head>
 <body>
     <header>
@@ -32,6 +32,7 @@ $base_path = $in_admin ? '../' : '';
                 <ul>
                     <li><a href="/gestion-absences/dashboard_etudiant.php">Dashboard</a></li>
                     <li><a href="/gestion-absences/etudiant/bilan_absences.php">Bilan des Absences</a></li>
+                    <li><a href="/gestion-absences/etudiant/justifier_absence.php">Justifier absence</a></li>
                     <li><a href="/gestion-absences/logout.php">Se déconnecter</a></li>
                 </ul>
             <?php elseif(!isConnected()):?>

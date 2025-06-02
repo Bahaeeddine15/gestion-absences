@@ -53,3 +53,14 @@ CREATE TABLE absences(
     justifiee BOOLEAN DEFAULT FALSE,
     commentaire TEXT
 );
+
+CREATE TABLE justificatifs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    etudiant_id INT NOT NULL,
+    module_id INT NOT NULL,
+    date_absence DATE NOT NULL,
+    fichier_path VARCHAR(255) NOT NULL,
+    statut ENUM('en_attente', 'valide', 'refuse') DEFAULT 'en_attente',
+    FOREIGN KEY (etudiant_id) REFERENCES etudiants(id_etudiant),
+    FOREIGN KEY (module_id) REFERENCES modules(id_module)
+);

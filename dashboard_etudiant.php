@@ -52,6 +52,13 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$id_etudiant]);
 $absencesByModule = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get all modules for the student
+$stmt = $pdo->prepare("
+    SELECT * FROM modules
+");
+$stmt->execute();
+$modules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -138,6 +145,7 @@ $absencesByModule = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
+
 </div>
 
 <?php include 'includes/footer.php'; ?>

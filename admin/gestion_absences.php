@@ -232,11 +232,6 @@ try {
                     <input type="date" id="date" name="date" value="<?php echo $absence_to_edit ? $absence_to_edit['date'] : date('Y-m-d'); ?>" required>
                 </div>
 
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="justifiee" name="justifiee" <?php echo ($absence_to_edit && $absence_to_edit['justifiee']) ? 'checked' : ''; ?>>
-                    <label for="justifiee">Absence justifiée</label>
-                </div>
-
                 <div class="form-group">
                     <label for="commentaire">Commentaire</label>
                     <textarea id="commentaire" name="commentaire" rows="3"><?php echo $absence_to_edit ? htmlspecialchars($absence_to_edit['commentaire']) : ''; ?></textarea>
@@ -297,6 +292,22 @@ try {
                     </div>
                 </form>
             </div>
+
+            <form class="absence-filters" method="get" action="../generer_rapport.php" target="_blank" style="display:inline;">
+                <select name="filiere">
+                    <option value="">Toutes les filières</option>
+                    <?php foreach ($filieres as $filiere): ?>
+                        <option value="<?php echo $filiere['id_filiere']; ?>"><?php echo htmlspecialchars($filiere['nom']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="module">
+                    <option value="">Tous les modules</option>
+                    <?php foreach ($modules as $module): ?>
+                        <option value="<?php echo $module['id_module']; ?>"><?php echo htmlspecialchars($module['nom']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-primary">Générer PDF</button>
+            </form>
 
             <?php if (empty($absences)): ?>
                 <p>Aucune absence trouvée.</p>
