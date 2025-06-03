@@ -11,8 +11,8 @@ function configureMail(PHPMailer $mail) {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'malikaizelgue@gmail.com';
-    $mail->Password   = 'ukcm jifk qdyb qcox';
+    $mail->Username   = 'your email';
+    $mail->Password   = 'your password';
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
     
