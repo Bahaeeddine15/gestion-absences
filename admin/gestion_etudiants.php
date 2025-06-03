@@ -11,43 +11,11 @@ require_once __DIR__ . '/../includes/header.php';
 <?php
 $error = '';
 $success = '';
+$student_to_edit = null; // <-- AJOUTE CETTE LIGNE
 if (isset($_GET['success'])) {
     $success = $_GET['success'];
 }
 
-//Add students
-if (isset($_POST["add"])) {
-    $nom = trim($_POST['nom']);
-    $prenom = trim($_POST['prenom']);
-    $email = trim($_POST['email']);
-    $numero_apogee = trim($_POST['numero_apogee']);
-    $mot_de_passe = $_POST['mot_de_passe'];
-    $id_filiere = $_POST['id_filiere'];
-
-    if (empty($nom) || empty($prenom) || empty($email) || empty($numero_apogee) || empty($mot_de_passe) || empty($id_filiere)) {
-        $error = 'Tous les champs sont obligatoires';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Format d\'email invalide';
-    } else {
-        try {
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants WHERE email = ? AND numero_apogee = ?");
-            $stmt->execute([$email, $numero_apogee]);
-            if ($stmt->fetchColumn() > 0) {
-                $error = 'Cet email ou numéro apogée existe déjà';
-            } else {
-                $hashedPassword = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO etudiants (nom,prenom,email,numero_apogee,password,id_filiere) VALUES (?,?,?,?,?,?)");
-                $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashedPassword, $id_filiere]);
-                $success = "Étudiant ajouté avec succès";
-                // After successful insert/update/delete operations:
-                header('Location: /gestion-absences/admin/gestion_etudiants.php?success=' . urlencode($success));
-                exit;
-            }
-        } catch (PDOException $e) {
-            $error = "Erreur lors de l'ajout de l'étudiant: " . $e->getMessage();
-        }
-    }
-}
 
 #Update student
 if (isset($_POST['update'])) {
@@ -65,22 +33,18 @@ if (isset($_POST['update'])) {
         $error = "Format d'email invalide";
     } else {
         try {
-            if ($student_to_edit) {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants WHERE (email = ? OR numero_apogee = ?) AND id_etudiant != ?");
-                $stmt->execute([$email, $numero_apogee, $id]);
-            } else {
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants WHERE email = ? OR numero_apogee = ?");
-                $stmt->execute([$email, $numero_apogee]);
-            }
+            // Vérifie s'il existe un autre étudiant avec le même email ou numéro apogée
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants WHERE (email = ? OR numero_apogee = ?) AND id_etudiant != ?");
+            $stmt->execute([$email, $numero_apogee, $id]);
             if ($stmt->fetchColumn() > 0) {
                 $error = 'Un autre étudiant avec cet email ou ce numéro Apogée existe déjà';
             } else {
                 if (!empty($mot_de_passe)) {
                     $hashedPassword = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("UPDATE etudiants SET nom = ?,prenom = ?, email=?, numero_apogee=?,password=?,id_filiere=? WHERE id_etudiant=?");
+                    $stmt = $pdo->prepare("UPDATE etudiants SET nom = ?, prenom = ?, email = ?, numero_apogee = ?, password = ?, id_filiere = ? WHERE id_etudiant = ?");
                     $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashedPassword, $id_filiere, $id]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE etudiants SET nom = ?,prenom = ?, email=?, numero_apogee=?,id_filiere=? WHERE id_etudiant=?");
+                    $stmt = $pdo->prepare("UPDATE etudiants SET nom = ?, prenom = ?, email = ?, numero_apogee = ?, id_filiere = ? WHERE id_etudiant = ?");
                     $stmt->execute([$nom, $prenom, $email, $numero_apogee, $id_filiere, $id]);
                 }
                 $success = 'Étudiant mis à jour avec succès';
@@ -173,60 +137,6 @@ try {
     <?php endif; ?>
 
     <div class="admin-content">
-        <div class="form-section">
-            <h2><?php echo ($student_to_edit ? 'Modifier l\'étudiant' : 'Ajouter un étudiant'); ?></h2>
-            <form method="post">
-                <?php if ($student_to_edit) : ?>
-                    <input type="hidden" name="id_etudiant" value="<?php echo $student_to_edit['id_etudiant']; ?>">
-                <?php endif; ?>
-
-                <div class="form-group">
-                    <label for="nom">Nom de l'étudiant</label>
-                    <input type="text" id="nom" name="nom" value="<?php echo $student_to_edit ? htmlspecialchars($student_to_edit['nom']) : ''; ?>" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="prenom">Prénom</label>
-                    <input type="text" id="prenom" name="prenom" value="<?php echo $student_to_edit ? htmlspecialchars($student_to_edit['prenom']) : ''; ?>" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="<?php echo $student_to_edit ? htmlspecialchars($student_to_edit['email']) : ''; ?>" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="numero_apogee">Numéro Apogée</label>
-                    <input type="number" id="numero_apogee" name="numero_apogee" value="<?php echo $student_to_edit ? htmlspecialchars($student_to_edit['numero_apogee']) : ''; ?>" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="mot_de_passe">Mot de passe <?php echo $student_to_edit ? '(laisser vide pour ne pas modifier)' : ''; ?></label>
-                    <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="<?php echo $student_to_edit ? '••••••••' : ''; ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="id_filiere">Filière</label>
-                    <select name="id_filiere" id="id_filiere" required>
-                        <option value="">Sélectionnez une filière</option>
-                        <?php foreach ($filieres as $filiere): ?>
-                            <option value="<?php echo $filiere['id_filiere']; ?>" <?php echo ($student_to_edit && $student_to_edit['id_filiere'] == $filiere['id_filiere']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($filiere['nom']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <button type="submit" name="<?php echo $student_to_edit ? 'update' : 'add'; ?>" class="btn btn-primary">
-                    <?php echo $student_to_edit ? 'Mettre à jour' : 'Ajouter'; ?>
-                </button>
-
-                <?php if ($student_to_edit) : ?>
-                    <a href="/gestion-absences/admin/gestion_etudiants.php" class="btn btn-secondary">Annuler</a>
-                <?php endif; ?>
-            </form>
-        </div>
-
         <div class="list-section">
             <h2>Liste des étudiants</h2>
             <?php if (empty($students)): ?>
@@ -265,31 +175,75 @@ try {
         </div>
 
         <?php if (!empty($students)): ?>
-            <div class="bulk-actions">
-                <h3>Actions groupées</h3>
-                <form method="post" action="../send_bulk_email.php">
-                    <div class="form-group">
-                        <label for="filiere_bulk">Filière:</label>
-                        <select name="filiere_id" id="filiere_bulk">
-                            <option value="all">Toutes les filières</option>
-                            <?php foreach ($filieres as $filiere): ?>
-                                <option value="<?php echo $filiere['id_filiere']; ?>">
-                                    <?php echo htmlspecialchars($filiere['nom']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="email_subject">Sujet:</label>
-                        <input type="text" name="subject" id="email_subject" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email_message">Message:</label>
-                        <textarea name="message" id="email_message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" name="send_bulk" class="btn">Envoyer email groupé</button>
-                </form>
-            </div>
+        <div class="form-section">
+            <?php if ($student_to_edit): ?>
+                <div class="edit-student-form">
+                    <h3>Modifier l'étudiant</h3>
+                    <form method="post">
+                        <input type="hidden" name="id_etudiant" value="<?php echo $student_to_edit['id_etudiant']; ?>">
+                        <div class="form-group">
+                            <label for="nom">Nom</label>
+                            <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($student_to_edit['nom']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prenom">Prénom</label>
+                            <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($student_to_edit['prenom']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($student_to_edit['email']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="numero_apogee">Numéro Apogée</label>
+                            <input type="text" id="numero_apogee" name="numero_apogee" value="<?php echo htmlspecialchars($student_to_edit['numero_apogee']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mot_de_passe">Mot de passe (laisser vide pour ne pas modifier)</label>
+                            <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_filiere">Filière</label>
+                            <select name="id_filiere" id="id_filiere" required>
+                                <option value="">Sélectionnez une filière</option>
+                                <?php foreach ($filieres as $filiere): ?>
+                                    <option value="<?php echo $filiere['id_filiere']; ?>" <?php echo ($student_to_edit['id_filiere'] == $filiere['id_filiere']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($filiere['nom']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <button type="submit" name="update" class="btn btn-primary">Enregistrer</button>
+                        <a href="gestion_etudiants.php" class="btn btn-secondary">Annuler</a>
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="bulk-actions">
+                    <h3>Actions groupées</h3>
+                    <form method="post" action="../send_bulk_email.php">
+                        <div class="form-group">
+                            <label for="filiere_bulk">Filière:</label>
+                            <select name="filiere_id" id="filiere_bulk">
+                                <option value="all">Toutes les filières</option>
+                                <?php foreach ($filieres as $filiere): ?>
+                                    <option value="<?php echo $filiere['id_filiere']; ?>">
+                                        <?php echo htmlspecialchars($filiere['nom']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email_subject">Sujet:</label>
+                            <input type="text" name="subject" id="email_subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email_message">Message:</label>
+                            <textarea name="message" id="email_message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" name="send_bulk" class="btn">Envoyer email groupé</button>
+                    </form>
+                </div>
+            <?php endif; ?>
+        </div>
         <?php endif; ?>
     </div>
 </div>
