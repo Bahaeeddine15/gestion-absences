@@ -65,4 +65,6 @@ CREATE TABLE justificatifs (
     FOREIGN KEY (module_id) REFERENCES modules(id_module)
 );
 
+ALTER TABLE absences ADD COLUMN justificatif VARCHAR(255) DEFAULT NULL;
+
 ALTER TABLE etudiants ADD COLUMN photo_profil VARCHAR(255) DEFAULT NULL;

@@ -23,7 +23,7 @@ if (isset($_POST['register'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $user_type = $_POST['user_type'];
-    
+
     // Validation basique
     if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
         $error = "Tous les champs obligatoires doivent être remplis";
@@ -32,7 +32,7 @@ if (isset($_POST['register'])) {
     } else {
         // Hashage du mot de passe
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        
+
         try {
             if ($user_type === 'admin') {
                 $username = $_POST['username'];
@@ -45,37 +45,55 @@ if (isset($_POST['register'])) {
                     // Insertion de l'administrateur
                     $stmt = $pdo->prepare("INSERT INTO admins (username, password, email) VALUES (?, ?, ?)");
                     $stmt->execute([$username, $hashed_password, $email]);
-                    
                     $success = "Compte administrateur créé avec succès! Votre nom d'utilisateur est: $username";
                 }
             } else {
                 // Récupération des données spécifiques aux étudiants
                 $numero_apogee = trim($_POST['numero_apogee']);
                 $id_filiere = $_POST['id_filiere'];
-                
-                if (empty($numero_apogee) || empty($id_filiere)) {
-                    $error = "Tous les champs obligatoires doivent être remplis";
+
+                // Gestion de la photo de profil
+                $photo_profil_path = null;
+                if (isset($_FILES['photo_profil']) && $_FILES['photo_profil']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'uploads/photos/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $fileTmpPath = $_FILES['photo_profil']['tmp_name'];
+                    $fileName = uniqid() . '_' . basename($_FILES['photo_profil']['name']);
+                    $filePath = $uploadDir . $fileName;
+                    $fileType = mime_content_type($fileTmpPath);
+
+                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (in_array($fileType, $allowedTypes)) {
+                        if (move_uploaded_file($fileTmpPath, $filePath)) {
+                            $photo_profil_path = $filePath;
+                        } else {
+                            $error = "Erreur lors de l'upload de la photo de profil.";
+                        }
+                    } else {
+                        $error = "Format de photo non supporté (JPEG, PNG, GIF, WEBP uniquement).";
+                    }
                 } else {
+                    $error = "Veuillez sélectionner une photo de profil.";
+                }
+
+                if (empty($numero_apogee) || empty($id_filiere) || empty($photo_profil_path)) {
+                    $error = "Tous les champs obligatoires doivent être remplis";
+                } else if (empty($error)) {
                     // Vérification que l'email et le numéro apogée n'existent pas déjà
                     $stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants WHERE email = ? OR numero_apogee = ?");
                     $stmt->execute([$email, $numero_apogee]);
                     if ($stmt->fetchColumn() > 0) {
                         $error = "Cet email ou ce numéro Apogée est déjà utilisé";
                     } else {
-                        // Insertion de l'étudiant
-                        $stmt = $pdo->prepare("INSERT INTO etudiants (nom, prenom, email, numero_apogee, password, id_filiere) VALUES (?, ?, ?, ?, ?, ?)");
-                        $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashed_password, $id_filiere]);
-                        
+                        // Insertion de l'étudiant avec la photo de profil
+                        $stmt = $pdo->prepare("INSERT INTO etudiants (nom, prenom, email, numero_apogee, password, id_filiere, photo_profil) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashed_password, $id_filiere, $photo_profil_path]);
+
                         // Envoi de l'email de bienvenue
                         $emailSent = sendWelcomeEmailToStudent($email, $nom, $prenom, $password);
-                        
-                        // Optionnel: journaliser le résultat
-                        if ($emailSent) {
-                            error_log("Email de bienvenue envoyé avec succès à: $email");
-                        } else {
-                            error_log("Échec de l'envoi de l'email de bienvenue à: $email");
-                        }
-                        
+
                         $success = "Compte étudiant créé avec succès! Vous pouvez maintenant vous connecter.";
                     }
                 }
@@ -99,7 +117,7 @@ if (isset($_POST['register'])) {
 
 <div class="container" id="container">
     <div class="form-container register-container">
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             <input type="hidden" name="user_type" value="student">
             <h1>Inscription Étudiant</h1>
             <input type="text" name="nom" placeholder="Nom" required>
@@ -110,11 +128,12 @@ if (isset($_POST['register'])) {
             <select name="id_filiere" required>
                 <option value="">-- Sélectionner une filière --</option>
                 <?php foreach ($filieres as $filiere): ?>
-                            <option value="<?php echo $filiere['id_filiere']; ?>"><?php echo htmlspecialchars($filiere['nom']); ?></option>
+                    <option value="<?php echo $filiere['id_filiere']; ?>"><?php echo htmlspecialchars($filiere['nom']); ?></option>
                 <?php endforeach; ?>
             </select>
 
             <input type="password" name="password" placeholder="Mot de passe" required>
+            <input type="file" name="photo_profil" accept="image/*" >
 
             <button type="submit" name="register" class="register-btn">S'inscrire</button>
             <div class="form-footer">
@@ -134,8 +153,7 @@ if (isset($_POST['register'])) {
             <input type="text" name="username" placeholder="Nom d'utilisateur" required>
             <input type="password" name="password" placeholder="Mot de passe" required>
 
-
-            <button type="submit" name = "register" class="register-btn">S'inscrire</button>
+            <button type="submit" name="register" class="register-btn">S'inscrire</button>
             <div class="form-footer">
                 <p>Vous avez déjà un compte? <a href="index.php">Se connecter</a></p>
             </div>
