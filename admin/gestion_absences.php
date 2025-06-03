@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/mail_functions.php';
 CheckAdmin();
-$title = 'Gestion des modules';
+$title = 'Gestion des absences';
 include __DIR__ . '/../includes/header.php';
 
 $message = "";
@@ -185,6 +186,33 @@ try {
     $error = "Erreur lors de la récupération des absences: " . $e->getMessage();
     $absences = [];
 }
+
+// In gestion_absences.php, add this near the top
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'send_summary') {
+        // Récupérer tous les étudiants
+        $stmt = $pdo->query("
+            SELECT DISTINCT e.id_etudiant
+            FROM etudiants e
+            JOIN absences a ON e.id_etudiant = a.id_etudiant
+        ");
+        $etudiants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $count = 0;
+        foreach ($etudiants as $etudiant) {
+            $result = sendAbsencesSummary($etudiant['id_etudiant']);
+            if ($result) {
+                $count++;
+            }
+        }
+
+        $_SESSION['success_message'] = "Récapitulatifs d'absences envoyés à {$count} étudiant(s).";
+
+        // Redirection pour éviter la re-soumission du formulaire
+        header("Location: gestion_absences.php?summary_sent=1&count={$count}");
+        exit;
+    }
+}
 ?>
 
 <div class="admin-container">
@@ -194,7 +222,7 @@ try {
         <?php if (isset($_GET['summary_sent'])): ?>
             <div class="success-message">
                 <i class="lni lni-checkmark-circle"></i>
-                Récapitulatifs d'absences envoyés avec succès : <?php echo htmlspecialchars($_GET['count']); ?> email(s).
+                <?php echo htmlspecialchars($_SESSION['success_message']); ?>
             </div>
         <?php endif; ?>
     </div>
@@ -328,6 +356,16 @@ try {
                 <button type="submit" class="btn btn-primary">Générer PDF</button>
             </form>
 
+            <div class="admin-actions">
+                <h3>Actions groupées</h3>
+                <form method="post" action="">
+                    <input type="hidden" name="action" value="send_summary">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i> Envoyer récapitulatifs d'absences
+                    </button>
+                </form>
+            </div>
+
             <?php if (empty($absences)): ?>
                 <p>Aucune absence trouvée.</p>
             <?php else: ?>
@@ -372,3 +410,10 @@ try {
 </div>
 
 <?php include '../includes/footer.php'; ?>
+
+<script>
+    document.querySelector('form[action="send_summary"]').addEventListener('submit', function() {
+        this.querySelector('button').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+        this.querySelector('button').disabled = true;
+    });
+</script>

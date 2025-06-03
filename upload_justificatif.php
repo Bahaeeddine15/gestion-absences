@@ -50,14 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE absences SET justifiee = 1 WHERE id_absence = ?");
             $stmt->execute([$absence['id_absence']]);
             $_SESSION['upload_success'] = "Justificatif envoyé avec succès. Votre absence a été marquée comme justifiée.";
+
+            // Envoyer notification par email
+            require_once 'includes/mail_functions.php';
+            sendJustificatifOnlyToStudent($etudiant_id, $module_id, $date_absence);
+
+            // Envoyer un récapitulatif mis à jour
+            sendAbsencesSummaryToStudent($etudiant_id);
         } else {
             // Pas d'absence enregistrée pour cette date/module, mais on garde le justificatif au cas où
             $_SESSION['upload_success'] = "Justificatif envoyé avec succès, mais aucune absence n'était enregistrée pour cette date et ce module.";
         }
-
-        // Envoyer notification par email
-        require_once 'includes/mail_functions.php';
-        sendJustificatifOnlyToStudent($etudiant_id, $module_id, $date_absence);
     } else {
         $_SESSION['upload_error'] = "Erreur lors de l'upload du fichier.";
     }
