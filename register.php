@@ -2,6 +2,7 @@
 require_once 'includes/header.php';
 require_once 'config/db.php';
 require_once 'includes/auth.php';
+require_once 'includes/mail_functions.php';
 
 $pageTitle = 'Inscription - Gestion des Absences';
 $error = '';
@@ -64,6 +65,16 @@ if (isset($_POST['register'])) {
                         // Insertion de l'étudiant
                         $stmt = $pdo->prepare("INSERT INTO etudiants (nom, prenom, email, numero_apogee, password, id_filiere) VALUES (?, ?, ?, ?, ?, ?)");
                         $stmt->execute([$nom, $prenom, $email, $numero_apogee, $hashed_password, $id_filiere]);
+                        
+                        // Envoi de l'email de bienvenue
+                        $emailSent = sendWelcomeEmailToStudent($email, $nom, $prenom, $password);
+                        
+                        // Optionnel: journaliser le résultat
+                        if ($emailSent) {
+                            error_log("Email de bienvenue envoyé avec succès à: $email");
+                        } else {
+                            error_log("Échec de l'envoi de l'email de bienvenue à: $email");
+                        }
                         
                         $success = "Compte étudiant créé avec succès! Vous pouvez maintenant vous connecter.";
                     }

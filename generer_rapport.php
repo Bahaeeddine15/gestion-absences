@@ -45,22 +45,25 @@ foreach ($data as $row) {
     ];
 }
 
-// Générer le nom du fichier
-$filename = 'absences';
-if ($filiere) $filename .= '_filiere' . $filiere;
-if ($module) $filename .= '_module' . $module;
-$filename .= '.pdf';
+// Create PDF directory if it doesn't exist
+$pdf_dir = __DIR__ . '/pdf';
+if (!is_dir($pdf_dir)) {
+    mkdir($pdf_dir, 0777, true);
+}
 
-// Générer le PDF
+// Generate the PDF
 $pdf = new AbsencePDF();
 $pdf->AddPage();
-$pdf->SetFont('Arial', '', 12);
 $pdf->AbsenceTable($header, $rows);
 
-// Sauvegarder dans /pdf/
-$pdf_path = __DIR__ . '/pdf/' . $filename;
-$pdf->Output('F', $pdf_path);
+// Make sure the path exists and is writeable
+$pdf_file = $pdf_dir . '/absences.pdf';
+$pdf->Output('F', $pdf_file);
 
-// Télécharger directement
-$pdf->Output('D', $filename);
+// Provide the PDF for download
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="rapport_absences.pdf"');
+header('Cache-Control: max-age=0');
+readfile($pdf_file);
+
 exit;

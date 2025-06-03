@@ -64,3 +64,4 @@ CREATE TABLE justificatifs (
     FOREIGN KEY (etudiant_id) REFERENCES etudiants(id_etudiant),
     FOREIGN KEY (module_id) REFERENCES modules(id_module)
 );
+

@@ -28,7 +28,11 @@ if (isset($_POST['add'])) {
                 // Insert new absence
                 $stmt = $pdo->prepare("INSERT INTO absences (id_etudiant, id_module, date, justifiee, commentaire) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$id_etudiant, $id_module, $date, $justifiee, $commentaire]);
-                $message = "Absence ajoutée avec succès";
+
+                require_once __DIR__ . '/../includes/mail_functions.php';
+                sendAbsenceAlertToStudent($id_etudiant, $id_module, $date);
+
+                $message = "Absence ajoutée avec succès. L'étudiant a été notifié par email.";
             }
         } catch (PDOException $e) {
             $error = "Erreur lors de l'ajout de l'absence: " . $e->getMessage();
@@ -181,11 +185,19 @@ try {
     $error = "Erreur lors de la récupération des absences: " . $e->getMessage();
     $absences = [];
 }
-
 ?>
 
 <div class="admin-container">
-    <h1>Gestion des Absences</h1>
+    <div class="admin-header">
+        <h1>Gestion des Absences</h1>
+
+        <?php if (isset($_GET['summary_sent'])): ?>
+            <div class="success-message">
+                <i class="lni lni-checkmark-circle"></i>
+                Récapitulatifs d'absences envoyés avec succès : <?php echo htmlspecialchars($_GET['count']); ?> email(s).
+            </div>
+        <?php endif; ?>
+    </div>
 
     <?php if (!empty($error)): ?>
         <div class="error"><?php echo $error; ?></div>
@@ -235,6 +247,13 @@ try {
                 <div class="form-group">
                     <label for="commentaire">Commentaire</label>
                     <textarea id="commentaire" name="commentaire" rows="3"><?php echo $absence_to_edit ? htmlspecialchars($absence_to_edit['commentaire']) : ''; ?></textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="justifiee" name="justifiee" value="1" <?php echo ($absence_to_edit && $absence_to_edit['justifiee']) ? 'checked' : ''; ?>>
+                        Absence justifiée
+                    </label>
                 </div>
 
                 <button type="submit" name="<?php echo $absence_to_edit ? 'update' : 'add'; ?>">
@@ -318,9 +337,9 @@ try {
                             <th>ID</th>
                             <th>Étudiant</th>
                             <th>Module</th>
-                            <th>Filière</th>
                             <th>Date</th>
                             <th>Justifiée</th>
+                            <th>Commentaire</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -330,20 +349,18 @@ try {
                                 <td><?php echo $absence['id_absence']; ?></td>
                                 <td><?php echo htmlspecialchars($absence['etudiant_nom'] . ' ' . $absence['etudiant_prenom']); ?></td>
                                 <td><?php echo htmlspecialchars($absence['module_nom']); ?></td>
-                                <td><?php echo htmlspecialchars($absence['filiere_nom']); ?></td>
+                                <td><?php echo date('d/m/Y', strtotime($absence['date'])); ?></td>
                                 <td>
-                                  <?php
-                                    // Supposons que $a['date'] est au format 'YYYY-MM-DD'
-                                    $date = DateTime::createFromFormat('Y-m-d', $absence['date']);
-                                    echo $date ? $date->format('d/m/Y') : htmlspecialchars($absence['date']);
-                                  ?>
+                                    <?php if ($absence['justifiee']): ?>
+                                        <span class="badge-yes">Oui</span>
+                                    <?php else: ?>
+                                        <span class="badge-no">Non</span>
+                                    <?php endif; ?>
                                 </td>
-                                <td><?php echo $absence['justifiee'] ? 'Oui' : 'Non'; ?></td>
+                                <td><?php echo htmlspecialchars($absence['commentaire'] ?? ''); ?></td>
                                 <td>
-                                    <div class="table-actions">
-                                        <a href="?edit=<?php echo $absence['id_absence']; ?>" class="btn-edit">Modifier</a>
-                                        <a href="?delete=<?php echo $absence['id_absence']; ?>" class="btn-delete" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</a>
-                                    </div>
+                                    <a href="?edit=<?php echo $absence['id_absence']; ?>" class="btn btn-edit">Modifier</a>
+                                    <a href="?delete=<?php echo $absence['id_absence']; ?>" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?')">Supprimer</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

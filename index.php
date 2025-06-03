@@ -76,9 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="remember" id="remember-student">
                     <label for="remember-student">Se souvenir de moi</label>
                 </div>
-                <div class="pass-link">
-                    <a href="reset_password.php">Mot de passe oublié?</a>
-                </div>
             </div>
             <button type="submit" class="login-btn">Se connecter</button>
             <div class="form-footer">
@@ -98,9 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="checkbox">
                     <input type="checkbox" name="remember" id="remember-admin">
                     <label for="remember-admin">Se souvenir de moi</label>
-                </div>
-                <div class="pass-link">
-                    <a href="reset_password.php">Mot de passe oublié?</a>
                 </div>
             </div>
             <button type="submit" class="login-btn">Se connecter</button>

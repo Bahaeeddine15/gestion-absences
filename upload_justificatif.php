@@ -38,16 +38,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Enregistrement en base du justificatif
         $stmt = $pdo->prepare("INSERT INTO justificatifs (etudiant_id, module_id, date_absence, fichier_path) VALUES (?, ?, ?, ?)");
         $stmt->execute([$etudiant_id, $module_id, $date_absence, "justificatifs/$apogee/$filename"]);
+        $justificatif_id = $pdo->lastInsertId();
 
-        // Mettre à jour l'absence correspondante comme justifiée
-        $stmt = $pdo->prepare("UPDATE absences SET justifiee = 1 WHERE id_etudiant = ? AND id_module = ? AND date = ?");
+        // Vérifier si l'absence existe déjà
+        $stmt = $pdo->prepare("SELECT id_absence FROM absences WHERE id_etudiant = ? AND id_module = ? AND date = ?");
         $stmt->execute([$etudiant_id, $module_id, $date_absence]);
+        $absence = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $_SESSION['upload_success'] = "Justificatif envoyé avec succès.";
+        if ($absence) {
+            // L'absence existe, mettre à jour comme justifiée
+            $stmt = $pdo->prepare("UPDATE absences SET justifiee = 1 WHERE id_absence = ?");
+            $stmt->execute([$absence['id_absence']]);
+            $_SESSION['upload_success'] = "Justificatif envoyé avec succès. Votre absence a été marquée comme justifiée.";
+        } else {
+            // Pas d'absence enregistrée pour cette date/module, mais on garde le justificatif au cas où
+            $_SESSION['upload_success'] = "Justificatif envoyé avec succès, mais aucune absence n'était enregistrée pour cette date et ce module.";
+        }
+
+        // Envoyer notification par email
+        require_once 'includes/mail_functions.php';
+        sendJustificatifOnlyToStudent($etudiant_id, $module_id, $date_absence);
     } else {
         $_SESSION['upload_error'] = "Erreur lors de l'upload du fichier.";
     }
     header('Location: dashboard_etudiant.php');
     exit;
 }
-?>

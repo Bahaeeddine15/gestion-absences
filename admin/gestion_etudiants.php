@@ -4,7 +4,9 @@ checkAdmin();
 $title = 'Gestion des étudiants';
 require_once __DIR__ . '/../includes/header.php';
 ?>
-<script>document.body.classList.add('page-gestion-etudiants');</script>
+<script>
+    document.body.classList.add('page-gestion-etudiants');
+</script>
 
 <?php
 $error = '';
@@ -253,7 +255,7 @@ try {
                                 <td><?php echo htmlspecialchars($student['filiere_nom'] ?? ''); ?></td>
                                 <td>
                                     <a href="?edit=<?php echo $student['id_etudiant']; ?>" class="btn btn-edit">Modifier</a>
-                                    <a href="?delete=<?php echo $student['id_etudiant']; ?>" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr?')">Supprimer</a>
+                                    <a href="?delete=<?php echo $student['id_etudiant']; ?>" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant?')">Supprimer</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -261,6 +263,34 @@ try {
                 </table>
             <?php endif; ?>
         </div>
+
+        <?php if (!empty($students)): ?>
+            <div class="bulk-actions">
+                <h3>Actions groupées</h3>
+                <form method="post" action="../send_bulk_email.php">
+                    <div class="form-group">
+                        <label for="filiere_bulk">Filière:</label>
+                        <select name="filiere_id" id="filiere_bulk">
+                            <option value="all">Toutes les filières</option>
+                            <?php foreach ($filieres as $filiere): ?>
+                                <option value="<?php echo $filiere['id_filiere']; ?>">
+                                    <?php echo htmlspecialchars($filiere['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="email_subject">Sujet:</label>
+                        <input type="text" name="subject" id="email_subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email_message">Message:</label>
+                        <textarea name="message" id="email_message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" name="send_bulk" class="btn">Envoyer email groupé</button>
+                </form>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
