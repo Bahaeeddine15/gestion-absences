@@ -142,11 +142,16 @@ try {
         SELECT a.*, 
                e.nom AS etudiant_nom, e.prenom AS etudiant_prenom, e.id_filiere,
                m.nom AS module_nom,
-               f.nom AS filiere_nom
+               f.nom AS filiere_nom,
+               j.fichier_path AS justificatif
         FROM absences a
         JOIN etudiants e ON a.id_etudiant = e.id_etudiant
         JOIN modules m ON a.id_module = m.id_module
         JOIN filieres f ON e.id_filiere = f.id_filiere
+        LEFT JOIN justificatifs j 
+            ON j.etudiant_id = a.id_etudiant 
+            AND j.module_id = a.id_module 
+            AND j.date_absence = a.date
         WHERE 1=1
     ";
     $params = [];
@@ -378,6 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <th>Date</th>
                             <th>Justifiée</th>
                             <th>Commentaire</th>
+                            <th>Justificatif</th> <!-- Ajouté -->
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -396,6 +402,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($absence['commentaire'] ?? ''); ?></td>
+                                <td>
+                                    <?php if (!empty($absence['justificatif'])): ?>
+                                        <a href="<?php echo '/gestion-absences/' . htmlspecialchars($absence['justificatif']); ?>" target="_blank" class="btn btn-primary btn-sm">Télécharger</a>
+                                    <?php else: ?>
+                                        <span style="color:#888;">Aucun</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <a href="?edit=<?php echo $absence['id_absence']; ?>" class="btn btn-edit">Modifier</a>
                                     <a href="?delete=<?php echo $absence['id_absence']; ?>" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?')">Supprimer</a>
